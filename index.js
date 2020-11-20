@@ -38,6 +38,15 @@ const readFile = (path) => fs.readFileSync(path, 'utf8')
 const components = getVueFiles(rootPath).map((path) => {
   const sfc = readFile(path)
   const compiled = compiler.parseComponent(sfc)
-  return compiled.script.content
+  return {path, content: compiled.script.content}
 })
-console.info(components)
+
+
+const imports = components.reduce((acc, curr) => {
+  const matches = curr.content.toString().match(/import.*/g)
+  if (matches && matches.length > 0) {
+    acc[curr.path] = matches
+  }
+  return acc
+}, [])
+console.info(imports)
