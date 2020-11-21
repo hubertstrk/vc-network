@@ -1,6 +1,7 @@
 const fs = require('fs-extra')
 const path = require('path')
 const compiler = require('vue-template-compiler')
+let acorn = require("acorn")
 
 const rootPath = 'C:\\Sources\\notes2.bootstrap\\'
 
@@ -43,10 +44,12 @@ const components = getVueFiles(rootPath).map((path) => {
 
 
 const imports = components.reduce((acc, curr) => {
-  const matches = curr.content.toString().match(/import.*/g)
-  if (matches && matches.length > 0) {
-    acc[curr.path] = matches
+  const js = acorn.parse(curr.content.toString(), {ecmaVersion: 2020, sourceType: 'module'})
+  const parsedImports = js.body.filter(x => x.type === 'ImportDeclaration').map(x => ({name: x.specifiers[0].local.name, value: x.source.value}))
+  if (parsedImports.length > 0) {
+    acc[curr.path] = parsedImports
   }
   return acc
-}, [])
-console.info(imports)
+}, {})
+
+console.info({imports})
