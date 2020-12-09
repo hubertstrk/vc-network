@@ -53,13 +53,13 @@ const sfcImports = components.reduce((acc, curr) => {
     .filter(x => x.type === 'ImportDeclaration')
     .reduce((acc, curr) => {
       if (curr.specifiers && curr.specifiers.length > 0) {
-        return acc.concat(curr.specifiers.map(x => `foo.${x.local.name}`))
+        return acc.concat(curr.specifiers.map(x => `${x.local.name}`))
       }
       return acc
     },[])
 
   if (is.length > 0) {
-    const source = `foo.${path.parse(curr.path).name}`
+    const source = `${path.parse(curr.path).name}`
     acc.push({source, is})
   }
   return acc
