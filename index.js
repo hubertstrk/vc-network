@@ -4,7 +4,7 @@ const compiler = require('vue-template-compiler')
 let acorn = require('acorn')
 const {flatten} = require('lodash')
 
-const rootPath = 'C:\\Sources\\novelc19'
+const rootPath = 'C:\\Sources\\notes2.bootstrap'
 
 /**
  * Returns all file with extension .vue
@@ -53,18 +53,26 @@ const sfcImports = components.reduce((acc, curr) => {
     .filter(x => x.type === 'ImportDeclaration')
     .reduce((acc, curr) => {
       if (curr.specifiers && curr.specifiers.length > 0) {
-        acc.push(curr.specifiers[0].local.name)
+        return acc.concat(curr.specifiers.map(x => `foo.${x.local.name}`))
       }
       return acc
     },[])
 
   if (is.length > 0) {
-    //acc[curr.path] = parsedImports
-    const source = path.parse(curr.path).name
+    const source = `foo.${path.parse(curr.path).name}`
     acc.push({source, is})
   }
   return acc
 }, [])
+
+// Force-Directed Graph with labels
+// { "nodes": [
+//   { "id": 1, "name": "A" },
+//   { "id": 2, "name": "B" }
+// ],
+// "links": [
+//   { "source": 1, "target": 2 }
+// ]}
 
 let links = sfcImports.map(sfcImport => {
   return sfcImport.is.map(x => ({source: sfcImport.source, target: x}))
@@ -82,12 +90,4 @@ const network = {
   links: links
 }
 
-// { "nodes": [
-//   { "id": 1, "name": "A" },
-//   { "id": 2, "name": "B" }
-// ],
-// "links": [
-//   { "source": 1, "target": 2 }
-// ]}
-
-console.info(JSON.stringify(network))
+fs.writeFile('foo.json', JSON.stringify(network), 'UTF-8')
